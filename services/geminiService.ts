@@ -11,27 +11,43 @@ export const fetchReviewsFromGemini = async (
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const prompt = `
-    Tu tarea es actuar como un asistente de investigación para encontrar reseñas de un negocio en Google. Se te proporcionará un nombre de negocio y un enlace para compartir de Google Maps.
+**TASK:** Find Google reviews for a business and return the data as a JSON object.
 
-    Sigue estos pasos con precisión:
-    1.  Usa la herramienta de Google Search para investigar el enlace de Google Maps ("${shareUrl}"). Tu objetivo es identificar el nombre exacto y la ubicación (dirección o coordenadas) a la que apunta este enlace.
-    2.  Compara la información del enlace con el nombre de negocio proporcionado ("${businessName}").
-    3.  Realiza una búsqueda combinada usando las herramientas de Google Search y Google Maps para encontrar un negocio que coincida con el nombre "${businessName}" Y que se encuentre en la ubicación identificada en el paso 1. La coincidencia debe ser alta.
-    4.  Una vez que hayas identificado con seguridad el negocio correcto, recopila sus reseñas de Google.
-    5.  Formatea la información recopilada en un objeto JSON.
+**INPUT:**
+*   \`business_name\`: "${businessName}"
+*   \`google_maps_url\`: "${shareUrl}"
 
-    Responde ÚNICAMENTE con un objeto JSON válido.
-    El JSON debe contener los siguientes campos:
-    - "summary": Un resumen corto y atractivo del sentimiento general de las reseñas.
-    - "averageRating": La calificación promedio en estrellas (un número de 1 a 5).
-    - "totalReviews": El número total de reseñas encontradas.
-    - "businessName": El nombre oficial y completo del negocio encontrado (debe coincidir lo más posible con el nombre proporcionado).
-    - "reviews": Un array de al menos 5 de las reseñas más relevantes, donde cada objeto tiene "author" (string), "rating" (number), y "text" (string).
+**INSTRUCTIONS:**
+1.  Use the \`googleSearch\` and \`googleMaps\` tools to locate the business that matches **BOTH** the \`business_name\` and the \`google_maps_url\`.
+2.  Extract the following information:
+    *   The official business name.
+    *   The overall average star rating.
+    *   The total number of reviews.
+    *   At least 5 of the most relevant public reviews (author, rating, text).
+    *   A brief, engaging summary of the reviews.
+3.  Format the extracted data into a single JSON object.
 
-    Tu respuesta DEBE ser solo el código JSON, sin ningún texto introductorio, explicaciones, ni formato markdown como \`\`\`json.
-    
-    Si, después de seguir los pasos, no puedes encontrar un negocio que coincida claramente con la información proporcionada, responde con este objeto JSON de error:
-    { "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps." }
+**OUTPUT RULES:**
+*   The **ENTIRE** response must be a single, valid JSON object.
+*   Do **NOT** include any text outside the JSON object (no explanations, no markdown).
+*   **SUCCESS CASE:** If the business is found, the JSON must follow this structure:
+    {
+      "summary": "string",
+      "averageRating": "number",
+      "totalReviews": "number",
+      "businessName": "string",
+      "reviews": [
+        {
+          "author": "string",
+          "rating": "number",
+          "text": "string"
+        }
+      ]
+    }
+*   **FAILURE CASE:** If you cannot definitively locate the business or its reviews, you **MUST** return this exact JSON object:
+    {
+      "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps."
+    }
   `;
   
   try {
