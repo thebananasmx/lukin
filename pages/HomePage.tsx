@@ -27,8 +27,8 @@ const HomePage: React.FC = () => {
             return;
         }
         // Basic validation for Google Maps link
-        if (!shareUrl.includes('goo.gl') && !shareUrl.includes('google.com/maps')) {
-             setError('El enlace no parece ser válido. Asegúrate de que sea un enlace para compartir de Google Maps.');
+        if (!shareUrl.includes('maps.app.goo.gl') && !shareUrl.includes('google.com/maps')) {
+             setError('El enlace no parece ser válido. Asegúrate de que sea un enlace para compartir de Google Maps (usualmente contiene "maps.app.goo.gl" o "google.com/maps").');
              return;
         }
         const searchParams = new URLSearchParams({

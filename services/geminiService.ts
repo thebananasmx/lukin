@@ -12,8 +12,8 @@ export const fetchReviewsFromGemini = async (
   const prompt = `
     Analiza el siguiente enlace para compartir de Google Maps: "${shareUrl}".
     
-    Identifica el negocio al que apunta este enlace y busca sus reseñas en Google Maps.
-    
+    Tu tarea es identificar el negocio en esa URL, buscar sus reseñas en Google Maps y extraer la información.
+
     Responde ÚNICAMENTE con un objeto JSON válido.
     El JSON debe contener los siguientes campos:
     - "summary": Un resumen corto y atractivo del sentimiento general de las reseñas.
@@ -23,7 +23,9 @@ export const fetchReviewsFromGemini = async (
     - "reviews": Un array de al menos 5 de las reseñas más relevantes, donde cada objeto tiene "author" (string), "rating" (number), y "text" (string).
 
     Tu respuesta DEBE ser solo el código JSON, sin ningún texto introductorio, explicaciones, ni formato markdown como \`\`\`json.
-    Si no puedes identificar el negocio o encontrar reseñas en el enlace, responde con un objeto JSON que contenga un campo de error: { "error": "No se pudo encontrar el negocio en el enlace proporcionado." }.
+    
+    Si el enlace no apunta a un negocio específico o no puedes encontrar reseñas, responde con este objeto JSON de error:
+    { "error": "No se pudo encontrar un negocio en el enlace. Asegúrate de que sea un enlace para 'Compartir' de un lugar específico en Google Maps y no una ruta o una búsqueda general." }
   `;
   
   try {

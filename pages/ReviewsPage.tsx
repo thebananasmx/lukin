@@ -38,7 +38,6 @@ const ShareIcon = () => (
     </svg>
 )
 
-
 const ReviewsPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
@@ -51,7 +50,6 @@ const ReviewsPage: React.FC = () => {
     const loadReviews = useCallback(async (url: string) => {
         setLoading(true);
         setError(null);
-
         try {
             const data = await fetchReviewsFromGemini(url);
             setReviewsData(data);
@@ -61,7 +59,7 @@ const ReviewsPage: React.FC = () => {
             setLoading(false);
         }
     }, []);
-
+    
     useEffect(() => {
         if (shareUrl) {
             loadReviews(shareUrl);
@@ -93,10 +91,10 @@ const ReviewsPage: React.FC = () => {
                     </div>
                 )}
                 
-                <main className="bg-gray-800/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 my-8 sm:my-12 overflow-hidden animate-fade-in-up">
-                    {loading && <LoadingSkeleton />}
-                    {reviewsData && !loading && (
-                      <>
+                 {loading && <LoadingSkeleton />}
+
+                {!loading && !error && reviewsData && (
+                    <main className="bg-gray-800/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 my-8 sm:my-12 overflow-hidden animate-fade-in-up">
                         <header className="text-center p-8 bg-gradient-to-br from-gray-800/80 to-gray-900/60">
                             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-lg">{reviewsData.businessName}</h1>
                             <div className="mt-5 flex items-center justify-center gap-3 text-gray-300">
@@ -137,9 +135,8 @@ const ReviewsPage: React.FC = () => {
                                 </Link>
                             </div>
                         </footer>
-                      </>
-                    )}
-                </main>
+                    </main>
+                )}
             </div>
         </div>
     );
