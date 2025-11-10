@@ -11,7 +11,7 @@ export const fetchReviewsFromGemini = async (
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const prompt = `
-**TASK:** Find Google reviews for a business and return the data as a JSON object.
+**TASK:** Find Google reviews for a business, translate them to Mexican Spanish, and return the data as a JSON object.
 
 **INPUT:**
 *   \`business_name\`: "${businessName}"
@@ -23,14 +23,20 @@ export const fetchReviewsFromGemini = async (
     *   The official business name.
     *   The overall average star rating.
     *   The total number of reviews.
-    *   At least 5 of the most relevant public reviews (author, rating, text).
-    *   A brief, engaging summary of the reviews.
-3.  Format the extracted data into a single JSON object.
+    *   At least 5 of the most relevant public reviews. For each review, get:
+        *   \`author\`: The full name of the user who wrote the review. Do not translate the name.
+        *   \`rating\`: The star rating given (as a number).
+        *   \`text\`: The original text of the review.
+    *   A brief, engaging summary of all the reviews.
+3.  **Translate the following text fields into Mexican Spanish (es-MX):**
+    *   The \`summary\`.
+    *   The \`text\` of each individual review.
+4.  Format the final, translated data into a single JSON object.
 
 **OUTPUT RULES:**
 *   The **ENTIRE** response must be a single, valid JSON object.
 *   Do **NOT** include any text outside the JSON object (no explanations, no markdown).
-*   **SUCCESS CASE:** If the business is found, the JSON must follow this structure:
+*   **SUCCESS CASE:** If the business is found, the JSON must follow this structure (with the specified fields translated to Mexican Spanish):
     {
       "summary": "string",
       "averageRating": "number",
@@ -48,7 +54,7 @@ export const fetchReviewsFromGemini = async (
     {
       "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps."
     }
-  `;
+`;
   
   try {
     const response = await ai.models.generateContent({
