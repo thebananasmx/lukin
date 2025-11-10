@@ -11,11 +11,14 @@ export const fetchReviewsFromGemini = async (
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const prompt = `
-    Analiza la siguiente información de un negocio:
-    - Nombre del Negocio: "${businessName}"
-    - Enlace para compartir de Google Maps: "${shareUrl}"
-    
-    Tu tarea es usar esta información para encontrar el negocio correcto en Google Maps, buscar sus reseñas y extraer la información. El nombre del negocio es la fuente principal de verdad, usa el enlace como ayuda para localizarlo si es necesario.
+    Tu tarea es actuar como un asistente de investigación para encontrar reseñas de un negocio en Google. Se te proporcionará un nombre de negocio y un enlace para compartir de Google Maps.
+
+    Sigue estos pasos con precisión:
+    1.  Usa la herramienta de Google Search para investigar el enlace de Google Maps ("${shareUrl}"). Tu objetivo es identificar el nombre exacto y la ubicación (dirección o coordenadas) a la que apunta este enlace.
+    2.  Compara la información del enlace con el nombre de negocio proporcionado ("${businessName}").
+    3.  Realiza una búsqueda combinada usando las herramientas de Google Search y Google Maps para encontrar un negocio que coincida con el nombre "${businessName}" Y que se encuentre en la ubicación identificada en el paso 1. La coincidencia debe ser alta.
+    4.  Una vez que hayas identificado con seguridad el negocio correcto, recopila sus reseñas de Google.
+    5.  Formatea la información recopilada en un objeto JSON.
 
     Responde ÚNICAMENTE con un objeto JSON válido.
     El JSON debe contener los siguientes campos:
@@ -27,7 +30,7 @@ export const fetchReviewsFromGemini = async (
 
     Tu respuesta DEBE ser solo el código JSON, sin ningún texto introductorio, explicaciones, ni formato markdown como \`\`\`json.
     
-    Si no puedes encontrar un negocio que coincida con el nombre y el enlace proporcionados, responde con este objeto JSON de error:
+    Si, después de seguir los pasos, no puedes encontrar un negocio que coincida claramente con la información proporcionada, responde con este objeto JSON de error:
     { "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps." }
   `;
   
@@ -36,7 +39,7 @@ export const fetchReviewsFromGemini = async (
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        tools: [{ googleMaps: {} }],
+        tools: [{ googleMaps: {} }, { googleSearch: {} }],
       },
     });
 
