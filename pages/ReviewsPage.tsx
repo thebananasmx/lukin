@@ -46,12 +46,13 @@ const ReviewsPage: React.FC = () => {
     const [isCopied, setIsCopied] = useState(false);
 
     const shareUrl = searchParams.get('url');
+    const businessName = searchParams.get('name');
 
-    const loadReviews = useCallback(async (url: string) => {
+    const loadReviews = useCallback(async (url: string, name: string) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await fetchReviewsFromGemini(url);
+            const data = await fetchReviewsFromGemini(url, name);
             setReviewsData(data);
         } catch (err: any) {
             setError(err.message || 'Ocurrió un error inesperado.');
@@ -61,13 +62,13 @@ const ReviewsPage: React.FC = () => {
     }, []);
     
     useEffect(() => {
-        if (shareUrl) {
-            loadReviews(shareUrl);
+        if (shareUrl && businessName) {
+            loadReviews(shareUrl, businessName);
         } else {
-            setError("Falta el enlace para compartir de Google Maps.");
+            setError("Falta información del negocio (enlace o nombre).");
             setLoading(false);
         }
-    }, [shareUrl, loadReviews]);
+    }, [shareUrl, businessName, loadReviews]);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href);

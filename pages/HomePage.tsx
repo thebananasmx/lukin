@@ -8,6 +8,12 @@ const LinkIcon = () => (
     </svg>
 );
 
+const BusinessIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+);
+
 
 const SparklesIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -16,14 +22,15 @@ const SparklesIcon = () => (
 );
 
 const HomePage: React.FC = () => {
+    const [businessName, setBusinessName] = useState('');
     const [shareUrl, setShareUrl] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!shareUrl.trim()) {
-            setError('Por favor, ingresa un enlace para compartir de Google Maps.');
+        if (!shareUrl.trim() || !businessName.trim()) {
+            setError('Por favor, ingresa el nombre del negocio y el enlace de Google Maps.');
             return;
         }
         // Basic validation for Google Maps link
@@ -33,6 +40,7 @@ const HomePage: React.FC = () => {
         }
         const searchParams = new URLSearchParams({
             url: shareUrl,
+            name: businessName,
         });
         navigate(`/reviews?${searchParams.toString()}`);
     };
@@ -45,8 +53,23 @@ const HomePage: React.FC = () => {
                     <p className="text-gray-400 mt-2">Pega un enlace de Google Maps y crea una página de reseñas al instante.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                     <div>
+                        <label htmlFor="businessName" className="block text-sm font-medium text-gray-300">Nombre del Negocio</label>
+                        <div className="mt-1 relative">
+                             <BusinessIcon />
+                             <input
+                                id="businessName"
+                                type="text"
+                                value={businessName}
+                                onChange={(e) => { setBusinessName(e.target.value); setError(''); }}
+                                placeholder="Ej: Restaurante El Buen Sabor"
+                                className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required
+                            />
+                        </div>
+                    </div>
                     <div>
-                        <label htmlFor="shareUrl" className="block text-sm font-medium text-gray-300">Enlace para Compartir de Google Maps</label>
+                        <label htmlFor="shareUrl" className="block text-sm font-medium text-gray-300">Enlace de Google Maps del Negocio</label>
                         <div className="mt-1 relative">
                              <LinkIcon />
                              <input
