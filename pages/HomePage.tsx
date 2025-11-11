@@ -101,10 +101,10 @@ const HomePage: React.FC = () => {
                         <DollarIcon />
                     </div>
                     <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-black leading-none">
-                       Scale up your best conversations
+                       Prueba Social impulsada por IA
                     </h1>
                     <p className="text-gray-600 mt-4 max-w-lg mx-auto text-lg">
-                       Powerful automations for all the ways you engage and monetize.
+                       Genera páginas de reseñas de Google Maps en segundos para convencer a más clientes.
                     </p>
                     
                     <form ref={formRef} onSubmit={handleSubmit} className="mt-10 space-y-6 text-left">
@@ -158,9 +158,9 @@ const HomePage: React.FC = () => {
                 </div>
             </main>
              <div className="bg-yellow-300 p-10 text-center">
-                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-none">Turn comments into conversations that sell</h2>
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-none">Convierte comentarios en conversaciones que venden</h2>
                  <p className="text-black/80 mt-4 max-w-xl mx-auto">
-                    “How much is this?” or “Do you ship to Mars?” Instant reply. Boom — wallets open, money.
+                    "¿Cuánto cuesta?" o "¿Hacen envíos a Marte?". Respuestas al instante. Boom — las carteras se abren.
                 </p>
                 <div className="mt-8">
                     <button
