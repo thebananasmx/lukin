@@ -1,5 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+// Fix: Defined a named interface for `window.aistudio` to resolve a TypeScript type conflict.
+interface AIStudio {
+    hasSelectedApiKey: () => Promise<boolean>;
+    openSelectKey: () => Promise<void>;
+}
+
+declare global {
+    interface Window {
+        aistudio?: AIStudio;
+    }
+}
 
 const Logo = () => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -15,14 +27,59 @@ const DollarIcon = () => (
     </div>
 );
 
+const KeyIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="inline-block h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L4.636 19.38l-1.414-1.414L8.86 12.328A6 6 0 1118 8zm-8 3a4 4 0 100-8 4 4 0 000 8z" clipRule="evenodd" />
+    </svg>
+);
+
+
 const HomePage: React.FC = () => {
     const [businessName, setBusinessName] = useState('');
     const [shareUrl, setShareUrl] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const formRef = useRef<HTMLFormElement>(null);
+
+    const [isApiKeySelected, setIsApiKeySelected] = useState(false);
+    const [isCheckingApiKey, setIsCheckingApiKey] = useState(true);
+
+    useEffect(() => {
+        const checkApiKey = async () => {
+            if (window.aistudio && typeof window.aistudio.hasSelectedApiKey === 'function') {
+                try {
+                    const hasKey = await window.aistudio.hasSelectedApiKey();
+                    setIsApiKeySelected(hasKey);
+                } catch (e) {
+                    console.error("Error checking for API key:", e);
+                    setIsApiKeySelected(true); // Assume key exists if check fails
+                }
+            } else {
+                // If not in AI Studio, assume key is available through environment variables
+                setIsApiKeySelected(true);
+            }
+            setIsCheckingApiKey(false);
+        };
+        checkApiKey();
+    }, []);
+
+    const handleSelectKey = async () => {
+        if (window.aistudio && typeof window.aistudio.openSelectKey === 'function') {
+            await window.aistudio.openSelectKey();
+            // As per instructions, assume key selection was successful to avoid race conditions.
+            setIsApiKeySelected(true);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (isCheckingApiKey) return;
+
+        if (!isApiKeySelected) {
+            handleSelectKey();
+            return;
+        }
+
         if (!shareUrl.trim() || !businessName.trim()) {
             setError('Por favor, ingresa el nombre del negocio y el enlace de Google Maps.');
             return;
@@ -42,8 +99,12 @@ const HomePage: React.FC = () => {
         <>
             <header className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-between items-center">
                 <Logo />
-                <button onClick={handleSubmit} className="bg-fuchsia-500 text-white font-bold py-2 px-5 rounded-full text-sm hover:bg-fuchsia-600 transition-colors">
-                    GET STARTED
+                <button 
+                    onClick={() => formRef.current?.requestSubmit()} 
+                    className="bg-fuchsia-500 text-white font-bold py-2 px-5 rounded-full text-sm hover:bg-fuchsia-600 transition-colors"
+                    disabled={isCheckingApiKey}
+                >
+                    {isApiKeySelected ? 'GET STARTED' : 'CONFIGURAR API KEY'}
                 </button>
             </header>
             <main className="flex flex-col items-center justify-center min-h-screen p-4 text-center pt-24">
@@ -58,7 +119,7 @@ const HomePage: React.FC = () => {
                        Powerful automations for all the ways you engage and monetize.
                     </p>
                     
-                    <form onSubmit={handleSubmit} className="mt-10 space-y-6 text-left">
+                    <form ref={formRef} onSubmit={handleSubmit} className="mt-10 space-y-6 text-left">
                         <div>
                             <label htmlFor="businessName" className="block text-sm font-bold text-gray-700 mb-1">Nombre del Negocio</label>
                             <input
@@ -86,12 +147,23 @@ const HomePage: React.FC = () => {
                         
                         {error && <p className="text-red-600 text-sm text-center">{error}</p>}
                         
+                        {!isApiKeySelected && !isCheckingApiKey && (
+                            <p className="text-center text-fuchsia-700 font-semibold flex items-center justify-center pt-2">
+                                <KeyIcon /> Es necesario configurar tu API Key para continuar.
+                            </p>
+                        )}
+
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                className="w-full py-4 px-8 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105"
+                                disabled={isCheckingApiKey}
+                                className="w-full py-4 px-8 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                GENERAR PÁGINA DE RESEÑAS
+                                {isCheckingApiKey && 'VERIFICANDO...'}
+                                {!isCheckingApiKey && !isApiKeySelected && (
+                                    <span className="flex items-center justify-center"><KeyIcon /> CONFIGURAR API KEY</span>
+                                )}
+                                {!isCheckingApiKey && isApiKeySelected && 'GENERAR PÁGINA DE RESEÑAS'}
                             </button>
                         </div>
                     </form>
@@ -105,16 +177,24 @@ const HomePage: React.FC = () => {
                 <div className="mt-8">
                     <button
                         onClick={(e) => {
+                             if (!isApiKeySelected) {
+                                e.preventDefault();
+                                handleSelectKey();
+                                return;
+                            }
                             if (!shareUrl || !businessName) {
                                 e.preventDefault();
                                 document.getElementById('businessName')?.focus();
                             } else {
-                                handleSubmit(e);
+                                formRef.current?.requestSubmit();
                             }
                         }}
-                        className="py-4 px-10 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105"
+                        className="py-4 px-10 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105 disabled:opacity-50"
+                        disabled={isCheckingApiKey}
                     >
-                        GET STARTED
+                        {isCheckingApiKey && 'VERIFICANDO...'}
+                        {!isCheckingApiKey && !isApiKeySelected && 'CONFIGURAR API KEY'}
+                        {!isCheckingApiKey && isApiKeySelected && 'GET STARTED'}
                     </button>
                 </div>
             </div>

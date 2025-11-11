@@ -12,6 +12,12 @@ const SpinnerIcon = () => (
     </svg>
 );
 
+const WarningIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+);
+
 const loadingMessages = [
     "Contactando a nuestros agentes de IA...",
     "Buscando tu negocio en el universo digital...",
@@ -68,7 +74,12 @@ const ReviewsPage: React.FC = () => {
             const data = await fetchReviewsFromGemini(url, name);
             setReviewsData(data);
         } catch (err: any) {
-            setError(err.message || 'Ocurrió un error inesperado.');
+            const errorMessage = err.message || 'Ocurrió un error inesperado.';
+            if (errorMessage.includes("Requested entity was not found") || errorMessage.includes("API key not valid")) {
+                setError("Tu clave de API parece no ser válida o no tiene los permisos necesarios. Por favor, regresa y selecciona una clave de API válida para continuar.");
+            } else {
+                setError(errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -89,20 +100,25 @@ const ReviewsPage: React.FC = () => {
         setTimeout(() => setIsCopied(false), 2500);
     };
 
+    const isApiKeyError = error && (error.includes("clave de API") || error.includes("API key"));
+
     return (
         <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
                 {error && (
                     <div className="text-center bg-red-50 border border-red-200 p-6 rounded-2xl my-12">
-                        <h2 className="text-2xl font-bold text-red-800">¡Oops! Algo salió mal</h2>
+                        {isApiKeyError && <WarningIcon />}
+                        <h2 className="text-2xl font-bold text-red-800 mt-4">
+                            {isApiKeyError ? 'Error de Clave de API' : '¡Oops! Algo salió mal'}
+                        </h2>
                         <p className="text-red-600 mt-2">{error}</p>
                         <Link to="/" className="mt-6 inline-block bg-black text-white font-bold py-2 px-5 rounded-full hover:bg-gray-800 transition-colors">
-                            Intentar de Nuevo
+                            {isApiKeyError ? 'Volver a la Página Principal' : 'Intentar de Nuevo'}
                         </Link>
                     </div>
                 )}
                 
-                 {loading && <LoadingState />}
+                 {loading && !error && <LoadingState />}
 
                 {!loading && !error && reviewsData && (
                     <main>
