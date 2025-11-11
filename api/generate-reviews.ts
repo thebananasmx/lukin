@@ -38,9 +38,10 @@ export default async function handler(
 *   \`google_maps_url\`: "${shareUrl}"
 
 **INSTRUCTIONS:**
-1.  Use the \`googleSearch\` and \`googleMaps\` tools to locate the business that matches **BOTH** the \`business_name\` and the \`google_maps_url\`.
-2.  Extract the following information:
-    *   The official business name.
+1.  **Prioritize the \`google_maps_url\`**. Use the \`googleMaps\` tool to identify the exact business at this URL. This URL is the most reliable piece of information.
+2.  Use the provided \`business_name\` only as a secondary confirmation. If the official name found via the URL is slightly different (e.g., "Restaurante El Sabor" vs "El Sabor"), trust the business found at the URL and proceed.
+3.  Once the business is correctly identified, extract the following information:
+    *   The official business name from Google Maps.
     *   The overall average star rating.
     *   The total number of reviews.
     *   At least 5 of the most relevant public reviews. For each review, get:
@@ -48,10 +49,10 @@ export default async function handler(
         *   \`rating\`: The star rating given (as a number).
         *   \`text\`: The original text of the review.
     *   A brief, engaging summary of all the reviews.
-3.  **Translate the following text fields into Mexican Spanish (es-MX):**
+4.  **Translate the following text fields into Mexican Spanish (es-MX):**
     *   The \`summary\`.
     *   The \`text\` of each individual review.
-4.  Format the final, translated data into a single JSON object.
+5.  Format the final, translated data into a single JSON object.
 
 **OUTPUT RULES:**
 *   The **ENTIRE** response must be a single, valid JSON object.
@@ -70,7 +71,7 @@ export default async function handler(
         }
       ]
     }
-*   **FAILURE CASE:** If you cannot definitively locate the business or its reviews, you **MUST** return this exact JSON object:
+*   **FAILURE CASE:** If you cannot definitively locate the business or its reviews using the URL, you **MUST** return this exact JSON object:
     {
       "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps."
     }
@@ -82,7 +83,7 @@ export default async function handler(
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        tools: [{ googleMaps: {} }, { googleSearch: {} }],
+        tools: [{ googleMaps: {} }],
       },
     });
     console.log("Received response from Gemini API.");

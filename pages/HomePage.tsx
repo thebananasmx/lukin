@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Fix: Defined a named interface for `window.aistudio` to resolve a TypeScript type conflict.
-interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-}
-
+// Fix: Resolved a TypeScript type conflict by defining the type for `window.aistudio` inline,
+// which prevents potential duplicate or conflicting global type definitions.
 declare global {
     interface Window {
-        aistudio?: AIStudio;
+        aistudio?: {
+            hasSelectedApiKey: () => Promise<boolean>;
+            openSelectKey: () => Promise<void>;
+        };
     }
 }
 
