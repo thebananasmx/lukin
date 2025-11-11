@@ -220,6 +220,21 @@ const ReviewsPage: React.FC = () => {
                     </main>
                 )}
             </div>
+             {/* Floating Action Button */}
+            {!loading && !error && reviewsData && shareUrl && (
+                <a
+                    href={shareUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="fixed z-50 bottom-6 right-6 bg-blue-600 text-white font-bold py-3 px-5 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                    aria-label="Cómo llegar al negocio en Google Maps"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    <span className="hidden sm:inline">Cómo llegar</span>
+                </a>
+            )}
         </div>
     );
 };
