@@ -13,16 +13,20 @@ export default async function handler(
   }
 
   const { shareUrl, businessName } = request.body;
+  console.log("Function invoked. Received shareUrl:", shareUrl, "and businessName:", businessName);
+
 
   if (!shareUrl || !businessName) {
+    console.warn("Missing parameters: shareUrl or businessName.");
     return response.status(400).json({ error: 'Faltan los parámetros shareUrl o businessName en la solicitud.' });
   }
 
   // The API_KEY is securely accessed from environment variables on the server
   if (!process.env.API_KEY) {
-    console.error("API key not found on server.");
+    console.error("CRITICAL: API_KEY environment variable not found on server.");
     return response.status(500).json({ error: "Error de configuración del servidor: no se encontró la clave API." });
   }
+  console.log("API_KEY found. Initializing GoogleGenAI.");
   
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -73,6 +77,7 @@ export default async function handler(
 `;
 
   try {
+    console.log("Sending request to Gemini API...");
     const geminiResponse = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -80,11 +85,14 @@ export default async function handler(
         tools: [{ googleMaps: {} }, { googleSearch: {} }],
       },
     });
+    console.log("Received response from Gemini API.");
 
     const jsonText = geminiResponse.text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    console.log("Cleaned text from Gemini:", jsonText.substring(0, 500) + "..."); // Log a snippet
     
     // We parse it here to validate it before sending it to the client
     const parsedData = JSON.parse(jsonText);
+    console.log("Successfully parsed JSON response from Gemini.");
 
     // Vercel serverless functions have a cache. Set headers to prevent caching of API responses.
     response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -93,10 +101,10 @@ export default async function handler(
 
     return response.status(200).json(parsedData);
   } catch (error: any) {
-    console.error("Error in serverless function:", error);
+    console.error("ERROR in serverless function:", error);
     let errorMessage = "Ocurrió un error desconocido al obtener las reseñas.";
     if (error instanceof SyntaxError) {
-      errorMessage = "La API de Gemini devolvió una respuesta inesperada con formato incorrecto.";
+      errorMessage = "La API de Gemini devolvió una respuesta inesperada con formato incorrecto. Revisa los logs del servidor para más detalles.";
     } else if (error.message) {
       errorMessage = error.message;
     }
