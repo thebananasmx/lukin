@@ -1,4 +1,6 @@
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+// FIX: Removed unused `Type` import as responseSchema is no longer used.
 import { GoogleGenAI } from "@google/genai";
 
 // This is the serverless function handler
@@ -30,70 +32,74 @@ export default async function handler(
   
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+  // FIX: Updated prompt to request JSON output directly, as responseSchema is not allowed with Google Maps grounding.
   const prompt = `
-**TASK:** Find Google reviews for a business, translate them to Mexican Spanish, and return the data as a JSON object.
+**TASK:** Find Google reviews for a business using its Google Maps URL and return its details.
 
-**INPUT:**
-*   \`business_name\`: "${businessName}"
+**BUSINESS DETAILS:**
+*   \`business_name_hint\`: "${businessName}"
 *   \`google_maps_url\`: "${shareUrl}"
 
 **INSTRUCTIONS:**
-1.  **Prioritize the \`google_maps_url\`**. Use the \`googleMaps\` tool to identify the exact business at this URL. This URL is the most reliable piece of information.
-2.  Use the provided \`business_name\` only as a secondary confirmation. If the official name found via the URL is slightly different (e.g., "Restaurante El Sabor" vs "El Sabor"), trust the business found at the URL and proceed.
-3.  Once the business is correctly identified, extract the following information:
-    *   The official business name from Google Maps.
-    *   The overall average star rating.
-    *   The total number of reviews.
-    *   At least 5 of the most relevant public reviews. For each review, get:
-        *   \`author\`: The full name of the user who wrote the review. Do not translate the name.
-        *   \`rating\`: The star rating given (as a number).
-        *   \`text\`: The original text of the review.
-    *   A brief, engaging summary of all the reviews.
-4.  **Translate the following text fields into Mexican Spanish (es-MX):**
-    *   The \`summary\`.
-    *   The \`text\` of each individual review.
-5.  Format the final, translated data into a single JSON object.
+1.  **Use the \`google_maps_url\` as the primary identifier**. Use the \`googleMaps\` tool to find the exact business at this URL. This is your source of truth.
+2.  The \`business_name_hint\` is just for context. The official name from the Google Maps URL is what you must use.
+3.  Extract the business's official name, average star rating, total number of reviews, and at least 5 of its most relevant reviews.
+4.  **Translate to Mexican Spanish (es-MX):**
+    *   Create a brief, engaging summary of all reviews.
+    *   Translate the text of each individual review.
+5.  Respond with a single JSON object containing the extracted and translated information. If you cannot find the business, the JSON object should contain an "error" key with an appropriate message.
 
-**OUTPUT RULES:**
-*   The **ENTIRE** response must be a single, valid JSON object.
-*   Do **NOT** include any text outside the JSON object (no explanations, no markdown).
-*   **SUCCESS CASE:** If the business is found, the JSON must follow this structure (with the specified fields translated to Mexican Spanish):
+**OUTPUT FORMAT:**
+Your response must be a single, valid JSON object. Do not include any other text, markdown formatting (like \`\`\`json), or explanations outside of the JSON object itself. The JSON object must have the following structure and data types:
+
+{
+  "summary": "string",
+  "averageRating": number,
+  "totalReviews": integer,
+  "businessName": "string",
+  "reviews": [
     {
-      "summary": "string",
-      "averageRating": "number",
-      "totalReviews": "number",
-      "businessName": "string",
-      "reviews": [
-        {
-          "author": "string",
-          "rating": "number",
-          "text": "string"
-        }
-      ]
+      "author": "string",
+      "rating": integer (1-5),
+      "text": "string"
     }
-*   **FAILURE CASE:** If you cannot definitively locate the business or its reviews using the URL, you **MUST** return this exact JSON object:
-    {
-      "error": "No se pudo encontrar un negocio con la información proporcionada. Asegúrate de que el nombre sea correcto y que el enlace apunte a un lugar específico en Google Maps."
-    }
+  ],
+  "error": "string"
+}
+
+If the business cannot be found, return a JSON object with only the "error" field, for example: {"error": "No se pudo encontrar el negocio en la URL proporcionada."}
 `;
+
+  // FIX: The `reviewsSchema` is no longer needed as the output format is described in the prompt.
+
 
   try {
     console.log("Sending request to Gemini API...");
     const geminiResponse = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
+      // FIX: Removed `responseMimeType` and `responseSchema` as they are not allowed when using the `googleMaps` tool.
       config: {
         tools: [{ googleMaps: {} }],
       },
     });
     console.log("Received response from Gemini API.");
-
-    const jsonText = geminiResponse.text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
-    console.log("Cleaned text from Gemini:", jsonText.substring(0, 500) + "..."); // Log a snippet
     
-    // We parse it here to validate it before sending it to the client
+    // FIX: Added logic to clean up potential markdown formatting from the response before parsing JSON.
+    let jsonText = geminiResponse.text.trim();
+    const match = jsonText.match(/```(?:json)?\s*([\s\S]+?)\s*```/);
+    if (match) {
+        jsonText = match[1];
+    }
+    console.log("Raw JSON text from Gemini:", jsonText.substring(0, 500) + "...");
+    
     const parsedData = JSON.parse(jsonText);
     console.log("Successfully parsed JSON response from Gemini.");
+
+    if (parsedData.error) {
+        console.warn("Gemini returned a functional error:", parsedData.error);
+        return response.status(404).json({ error: parsedData.error });
+    }
 
     // Vercel serverless functions have a cache. Set headers to prevent caching of API responses.
     response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

@@ -1,17 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Fix: Resolved a TypeScript type conflict by defining the type for `window.aistudio` inline,
-// which prevents potential duplicate or conflicting global type definitions.
-declare global {
-    interface Window {
-        aistudio?: {
-            hasSelectedApiKey: () => Promise<boolean>;
-            openSelectKey: () => Promise<void>;
-        };
-    }
-}
-
 const Logo = () => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M4.66602 23.3333V4.66667H11.666V12.8333L18.666 4.66667H23.3327V23.3333H16.3327V15.1667L9.33268 23.3333H4.66602Z" fill="black"/>
@@ -159,7 +148,7 @@ const HomePage: React.FC = () => {
                                 className="w-full py-4 px-8 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isCheckingApiKey && 'VERIFICANDO...'}
-                                {!isCheckingApiKey && !isApiKeySelected && (
+                                {!isApiKeySelected && !isApiKeySelected && (
                                     <span className="flex items-center justify-center"><KeyIcon /> CONFIGURAR API KEY</span>
                                 )}
                                 {!isCheckingApiKey && isApiKeySelected && 'GENERAR PÁGINA DE RESEÑAS'}
