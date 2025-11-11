@@ -186,6 +186,11 @@ const ReviewsPage: React.FC = () => {
                              <section className="p-8 bg-yellow-300 rounded-2xl">
                                 <h2 className="text-2xl font-black text-black text-center mb-6">Resumen General</h2>
                                 <SummaryDisplay summary={reviewsData.summary} />
+                                {reviewsData.summary.overall_summary && (
+                                    <p className="mt-6 text-center text-black/90 font-medium text-lg leading-relaxed">
+                                        {reviewsData.summary.overall_summary}
+                                    </p>
+                                )}
                             </section>
                             
                             <section>

@@ -10,6 +10,7 @@ export interface SummaryData {
   service: string;
   the_good: string;
   the_bad: string;
+  overall_summary: string;
 }
 
 export interface ReviewsData {

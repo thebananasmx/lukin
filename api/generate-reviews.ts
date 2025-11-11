@@ -44,9 +44,11 @@ export default async function handler(
 1.  **Use the \`google_maps_url\` as the primary identifier**. Use the \`googleMaps\` tool to find the exact business at this URL. This is your source of truth.
 2.  The \`business_name_hint\` is just for context. The official name from the Google Maps URL is what you must use.
 3.  Extract the business's official name, average star rating, total number of reviews, and at least 5 of its most relevant reviews.
-4.  **Analyze all reviews for common themes** and generate a structured summary object. This object should contain four key points based on the general sentiment: 'price', 'service', 'the_good' (a short positive highlight), and 'the_bad' (a short area for improvement).
+4.  **Analyze all reviews for common themes** and generate a structured summary object. This object should contain:
+    *   Four key points based on general sentiment: 'price', 'service', 'the_good' (a short positive highlight), and 'the_bad' (a short area for improvement).
+    *   A single, engaging summary paragraph ('overall_summary') of max 25 words that captures the business's essence.
 5.  **Translate to Mexican Spanish (es-MX):**
-    *   Translate the text for each of the four summary points.
+    *   Translate the text for all five summary points.
     *   Translate the text of each individual review.
 6.  Respond with a single JSON object containing the extracted and translated information. If you cannot find the business, the JSON object should contain an "error" key with an appropriate message.
 
@@ -58,7 +60,8 @@ Your response must be a single, valid JSON object. Do not include any other text
     "price": "string (e.g., 'Económico', 'Moderado', 'Caro')",
     "service": "string (e.g., 'Excelente', 'Bueno', 'Regular')",
     "the_good": "string (short positive highlight, max 10 words)",
-    "the_bad": "string (short area for improvement, max 10 words)"
+    "the_bad": "string (short area for improvement, max 10 words)",
+    "overall_summary": "string (engaging summary, max 25 words)"
   },
   "averageRating": number,
   "totalReviews": integer,
