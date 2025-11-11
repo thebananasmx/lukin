@@ -55,7 +55,58 @@ const ShareIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
       <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
     </svg>
-)
+);
+
+const SummaryDisplay = ({ summary }: { summary: ReviewsData['summary'] }) => {
+    
+    const PriceIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" />
+        </svg>
+    );
+
+    const ServiceIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+    );
+    
+    const GoodIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.085a2 2 0 00-1.736.97l-2.086 4.172A2 2 0 005.172 10h1.172a2 2 0 011.72 1.055l1.83 3.102a1 1 0 001.732 0l1.83-3.102a2 2 0 011.72-1.055h1.172z" />
+        </svg>
+    );
+
+    const BadIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.738 3h4.017c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.085a2 2 0 001.736-.97l2.086-4.172A2 2 0 0019.828 14h-1.172a2 2 0 01-1.72-1.055l-1.83-3.102a1 1 0 00-1.732 0l-1.83 3.102A2 2 0 0110.828 14H9.656z" />
+        </svg>
+    );
+
+    const summaryItems = [
+        { Icon: PriceIcon, title: "Precio", text: summary.price },
+        { Icon: ServiceIcon, title: "Servicio", text: summary.service },
+        { Icon: GoodIcon, title: "Lo Bueno", text: summary.the_good },
+        { Icon: BadIcon, title: "A mejorar", text: summary.the_bad },
+    ];
+
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+            {summaryItems.map(({ Icon, title, text }) => (
+                <div key={title} className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-black/10 rounded-full">
+                        <Icon />
+                    </div>
+                    <div>
+                        <p className="font-bold text-black">{title}</p>
+                        <p className="text-black/80 leading-snug">{text}</p>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 
 const ReviewsPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -132,9 +183,9 @@ const ReviewsPage: React.FC = () => {
                         </header>
                         
                         <div className="p-4 sm:p-0 space-y-8">
-                            <section className="p-8 bg-yellow-300 rounded-2xl">
-                                <h2 className="text-xl font-bold text-black mb-2 sr-only">Resumen General</h2>
-                                <p className="text-black/80 leading-relaxed text-center text-lg">{reviewsData.summary}</p>
+                             <section className="p-8 bg-yellow-300 rounded-2xl">
+                                <h2 className="text-2xl font-black text-black text-center mb-6">Resumen General</h2>
+                                <SummaryDisplay summary={reviewsData.summary} />
                             </section>
                             
                             <section>
