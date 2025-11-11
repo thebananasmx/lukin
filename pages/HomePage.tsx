@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Logo = () => (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4.66602 23.3333V4.66667H11.666V12.8333L18.666 4.66667H23.3327V23.3333H16.3327V15.1667L9.33268 23.3333H4.66602Z" fill="black"/>
-    </svg>
+    <div className="text-2xl font-black tracking-tighter text-black">
+        LUKN
+    </div>
 );
 
-const DollarIcon = () => (
+const HeroIcon = () => (
     <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-        <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5.5 12H12v2h-2v-2H8.5c-1.38 0-2.5-1.12-2.5-2.5S7.12 9 8.5 9H11V7h2v2h1.5c1.38 0 2.5 1.12 2.5 2.5S15.88 14 14.5 14zm0-3H12V9h2.5c.83 0 1.5.67 1.5 1.5S15.33 12 14.5 12zM11 12H8.5c-.83 0-1.5-.67-1.5-1.5S7.67 9 8.5 9H11v3z"/>
+        <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
     </div>
 );
@@ -98,7 +98,7 @@ const HomePage: React.FC = () => {
             <main className="flex flex-col items-center justify-center min-h-screen p-4 text-center pt-24">
                 <div className="w-full max-w-xl mx-auto">
                     <div className="flex justify-center">
-                        <DollarIcon />
+                        <HeroIcon />
                     </div>
                     <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-black leading-none">
                        Prueba Social impulsada por IA
