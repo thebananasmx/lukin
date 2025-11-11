@@ -6,7 +6,7 @@ import ReviewsPage from './pages/ReviewsPage';
 
 function App() {
   return (
-    <div className="bg-gray-900 text-white min-h-screen font-sans">
+    <div className="bg-white text-gray-900 min-h-screen">
       <HashRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />

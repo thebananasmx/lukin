@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const LinkIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0m-2.828 2.828a2 2 0 01-2.828 0l-3-3a2 2 0 112.828-2.828l3 3z" clipRule="evenodd" />
-        <path fillRule="evenodd" d="M6 8a2 2 0 012-2h4a2 2 0 110 4H8a2 2 0 01-2-2z" clipRule="evenodd" />
+const Logo = () => (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4.66602 23.3333V4.66667H11.666V12.8333L18.666 4.66667H23.3327V23.3333H16.3327V15.1667L9.33268 23.3333H4.66602Z" fill="black"/>
     </svg>
 );
 
-const BusinessIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-    </svg>
-);
-
-
-const SparklesIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.293 2.293a1 1 0 010 1.414L13 12l-1.293-1.293a1 1 0 010-1.414L14 7m5 5l2.293 2.293a1 1 0 010 1.414L19 18l-1.293-1.293a1 1 0 010-1.414L20 13M3 13l2.293 2.293a1 1 0 010 1.414L3 18l-1.293-1.293a1 1 0 010-1.414L4 13" />
-    </svg>
+const DollarIcon = () => (
+    <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+        <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5.5 12H12v2h-2v-2H8.5c-1.38 0-2.5-1.12-2.5-2.5S7.12 9 8.5 9H11V7h2v2h1.5c1.38 0 2.5 1.12 2.5 2.5S15.88 14 14.5 14zm0-3H12V9h2.5c.83 0 1.5.67 1.5 1.5S15.33 12 14.5 12zM11 12H8.5c-.83 0-1.5-.67-1.5-1.5S7.67 9 8.5 9H11v3z"/>
+        </svg>
+    </div>
 );
 
 const HomePage: React.FC = () => {
@@ -33,9 +27,8 @@ const HomePage: React.FC = () => {
             setError('Por favor, ingresa el nombre del negocio y el enlace de Google Maps.');
             return;
         }
-        // Basic validation for Google Maps link
         if (!shareUrl.includes('maps.app.goo.gl') && !shareUrl.includes('google.com/maps')) {
-             setError('El enlace no parece ser válido. Asegúrate de que sea un enlace para compartir de Google Maps (usualmente contiene "maps.app.goo.gl" o "google.com/maps").');
+             setError('El enlace no parece ser válido. Asegúrate de que sea un enlace para compartir de Google Maps.');
              return;
         }
         const searchParams = new URLSearchParams({
@@ -46,60 +39,89 @@ const HomePage: React.FC = () => {
     };
     
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900">
-            <div className="w-full max-w-md mx-auto bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white tracking-tight">Social Proof Studio</h1>
-                    <p className="text-gray-400 mt-2">Pega un enlace de Google Maps y crea una página de reseñas al instante.</p>
-                </div>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                     <div>
-                        <label htmlFor="businessName" className="block text-sm font-medium text-gray-300">Nombre del Negocio</label>
-                        <div className="mt-1 relative">
-                             <BusinessIcon />
-                             <input
+        <>
+            <header className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-between items-center">
+                <Logo />
+                <button onClick={handleSubmit} className="bg-fuchsia-500 text-white font-bold py-2 px-5 rounded-full text-sm hover:bg-fuchsia-600 transition-colors">
+                    GET STARTED
+                </button>
+            </header>
+            <main className="flex flex-col items-center justify-center min-h-screen p-4 text-center pt-24">
+                <div className="w-full max-w-xl mx-auto">
+                    <div className="flex justify-center">
+                        <DollarIcon />
+                    </div>
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-black leading-none">
+                       Scale up your best conversations
+                    </h1>
+                    <p className="text-gray-600 mt-4 max-w-lg mx-auto text-lg">
+                       Powerful automations for all the ways you engage and monetize.
+                    </p>
+                    
+                    <form onSubmit={handleSubmit} className="mt-10 space-y-6 text-left">
+                        <div>
+                            <label htmlFor="businessName" className="block text-sm font-bold text-gray-700 mb-1">Nombre del Negocio</label>
+                            <input
                                 id="businessName"
                                 type="text"
                                 value={businessName}
                                 onChange={(e) => { setBusinessName(e.target.value); setError(''); }}
                                 placeholder="Ej: Restaurante El Buen Sabor"
-                                className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="block w-full bg-transparent border-b-2 border-gray-300 py-3 text-lg text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
                                 required
                             />
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="shareUrl" className="block text-sm font-medium text-gray-300">Enlace de Google Maps del Negocio</label>
-                        <div className="mt-1 relative">
-                             <LinkIcon />
-                             <input
+                        <div>
+                            <label htmlFor="shareUrl" className="block text-sm font-bold text-gray-700 mb-1">Enlace de Google Maps</label>
+                            <input
                                 id="shareUrl"
                                 type="url"
                                 value={shareUrl}
                                 onChange={(e) => { setShareUrl(e.target.value); setError(''); }}
                                 placeholder="Ej: https://maps.app.goo.gl/..."
-                                className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="block w-full bg-transparent border-b-2 border-gray-300 py-3 text-lg text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
                                 required
                             />
                         </div>
-                    </div>
-                    
-                    {error && <p className="text-red-400 text-sm">{error}</p>}
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-800 transition-transform transform hover:scale-105"
-                        >
-                            <SparklesIcon />
-                            Generar Página de Reseñas
-                        </button>
-                    </div>
-                </form>
+                        
+                        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+                        
+                        <div className="pt-4">
+                            <button
+                                type="submit"
+                                className="w-full py-4 px-8 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105"
+                            >
+                                GENERAR PÁGINA DE RESEÑAS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+             <div className="bg-yellow-300 p-10 text-center">
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-none">Turn comments into conversations that sell</h2>
+                 <p className="text-black/80 mt-4 max-w-xl mx-auto">
+                    “How much is this?” or “Do you ship to Mars?” Instant reply. Boom — wallets open, money.
+                </p>
+                <div className="mt-8">
+                    <button
+                        onClick={(e) => {
+                            if (!shareUrl || !businessName) {
+                                e.preventDefault();
+                                document.getElementById('businessName')?.focus();
+                            } else {
+                                handleSubmit(e);
+                            }
+                        }}
+                        className="py-4 px-10 border border-transparent rounded-full shadow-lg text-lg font-bold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-transform transform hover:scale-105"
+                    >
+                        GET STARTED
+                    </button>
+                </div>
             </div>
-            <footer className="text-center mt-8 text-gray-500 text-sm">
+            <footer className="text-center py-8 text-gray-500 text-sm">
                 <p>Potenciado por Gemini API.</p>
             </footer>
-        </div>
+        </>
     );
 };
 
